@@ -1,0 +1,80 @@
+
+name: Deploy Service
+run-name: "${{ github.actor }} performed ${{ github.event_name }} on ${{ github.head_ref || github.ref_name }}"
+on:
+    push:
+        branches:
+            - master
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v4
+
+            - name: Setup runtime
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build project
+              run: npm run build  
+           
+    test:
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v4
+
+            - name: Setup runtime
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Install esbuild globally
+              run: npm install -g esbuild    
+            
+            - name: Run tests
+              run: npm run test
+    
+    deploy:
+        runs-on: ubuntu-latest
+        needs: test
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v4
+
+            - name: Setup runtime
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Install esbuild globally
+              run: npm install -g esbuild
+
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v3  
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: eu-central-1
+
+            - name: Sinthesize CDK Stack
+              run: |
+                npx cdk synth> cdk_output.yaml
+                echo "Synth output seccessfully." 
+
+            # - name: Deploy CDK Stack
+            #   run: |
+            #     npx cdk deploy --require-approval never
+            #     echo "Deployed successfully."
