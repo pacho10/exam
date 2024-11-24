@@ -74,7 +74,7 @@ jobs:
                 npx cdk synth> cdk_output.yaml
                 echo "Synth output seccessfully." 
 
-            # - name: Deploy CDK Stack
-            #   run: |
-            #     npx cdk deploy --require-approval never
-            #     echo "Deployed successfully."
+            - name: Deploy CDK Stack
+              run: |
+                npx cdk deploy --require-approval never
+                echo "Deployed successfully."
