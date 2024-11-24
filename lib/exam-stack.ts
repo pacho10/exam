@@ -4,8 +4,9 @@ import {Construct} from 'constructs';
 import {Bucket, EventType} from "aws-cdk-lib/aws-s3";
 import {Subscription, SubscriptionProtocol, Topic} from "aws-cdk-lib/aws-sns";
 import {NodejsFunction} from "aws-cdk-lib/aws-lambda-nodejs";
-import {Architecture, Runtime} from "aws-cdk-lib/aws-lambda";
+import {Architecture, FilterCriteria, FilterRule, Runtime, StartingPosition} from "aws-cdk-lib/aws-lambda";
 import {LambdaDestination} from "aws-cdk-lib/aws-s3-notifications";
+import {DynamoEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
 
 export class ExamStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -55,5 +56,22 @@ export class ExamStack extends cdk.Stack {
 
     metadataTable.grantReadWriteData(processFunction)
     notificationTopic.grantPublish(processFunction)
+
+    const dbNotificationFunction = new NodejsFunction(this, 'dbNotificationFunction', {
+      runtime: Runtime.NODEJS_20_X,
+      handler: 'handler',
+      entry: `${__dirname}/../src/notificationFunction.ts`,
+      architecture: Architecture.ARM_64,
+      environment: {
+        TOPIC_ARN: notificationTopic.topicArn
+      }
+    })
+
+    dbNotificationFunction.addEventSource(new DynamoEventSource(metadataTable, {
+      startingPosition: StartingPosition.LATEST
+    }))
+
+    notificationTopic.grantPublish(dbNotificationFunction)
+    metadataTable.grantReadWriteData(dbNotificationFunction)
   }
 }
