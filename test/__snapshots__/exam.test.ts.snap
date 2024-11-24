@@ -472,7 +472,7 @@ def sort_filter_rules(json_obj):
         },
         "Environment": {
           "Variables": {
-            "EMAIL_ADDRESS": "pmpetkov1983@gmail.com",
+            "EMAIL_ADDRESS": "hristo.zhelev@yahoo.com",
             "TABLE_NAME": {
               "Ref": "metadataTable54B6D960",
             },
