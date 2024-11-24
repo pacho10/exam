@@ -8,7 +8,7 @@ const dynamoClient = new DynamoDBClient({});
 export const handler = async (event: any) => {
     const tableName = process.env.TABLE_NAME;
     const topicArn = process.env.TOPIC_ARN;
-    const ttl = Math.floor(Date.now() / 1000) + 5 * 60;
+    const ttl = Math.floor(Date.now() / 1000) + 30 * 60;
 
     console.log(event.Records[0].s3)
 

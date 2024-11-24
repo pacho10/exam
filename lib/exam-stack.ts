@@ -68,7 +68,12 @@ export class ExamStack extends cdk.Stack {
     })
 
     dbNotificationFunction.addEventSource(new DynamoEventSource(metadataTable, {
-      startingPosition: StartingPosition.LATEST
+      startingPosition: StartingPosition.LATEST,
+      filters: [
+        FilterCriteria.filter({
+          eventName: FilterRule.isEqual('INSERT')
+        })
+      ]
     }))
 
     notificationTopic.grantPublish(dbNotificationFunction)

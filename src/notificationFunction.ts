@@ -5,14 +5,17 @@ const snsClient = new SNSClient({});
 export const handler = async (event: any) => {
     const topicArn = process.env.TOPIC_ARN;
 
-    console.log(event)
+    console.log(event.Records[0].dynamodb)
+    const fileExtension = event.Records[0].dynamodb.NewImage.FileExtension.S;
+    const size = event.Records[0].dynamodb.NewImage.Size.N;
+    const uploadDate = event.Records[0].dynamodb.NewImage.UploadDate.S;
 
     await snsClient.send(new PublishCommand({
         TopicArn: topicArn,
         Message: JSON.stringify({
-            "fileExtension": "jpg",
-            "size": 1024,
-            "uploadDate": new Date(Date.now()).toISOString()
+            "fileExtension": fileExtension,
+            "size": size,
+            "uploadDate": uploadDate
         })
     }))
 
