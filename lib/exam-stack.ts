@@ -46,7 +46,7 @@ export class ExamStack extends cdk.Stack {
       architecture: Architecture.ARM_64,
       environment: {
         TABLE_NAME: metadataTable.tableName,
-        EMAIL_ADDRESS: 'pmpetkov1983@gmail.com',
+        EMAIL_ADDRESS: 'hristo.zhelev@yahoo.com',
         TOPIC_ARN: notificationTopic.topicArn
       }
     })
